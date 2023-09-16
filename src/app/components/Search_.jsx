@@ -2,7 +2,7 @@
 import { Input, Button, useToast } from "@chakra-ui/react";
 import { useState } from "react";
 
-const search = ({setUserData, setLoading}) => {
+const search = ({ setUserData, setLoading }) => {
   const [query, setquery] = useState("");
   const toast = useToast();
 
@@ -12,6 +12,7 @@ const search = ({setUserData, setLoading}) => {
     setLoading(true);
     setUserData(null);
     try {
+
       const res = await fetch(`https://api.github.com/users/${query}`);
       const data = await res.json();
 
@@ -38,6 +39,22 @@ const search = ({setUserData, setLoading}) => {
       setLoading(false);
     }
   };
+  const addUserToLocalStorage = (data, username) => {
+		const users = JSON.parse(localStorage.getItem("github-users")) || [];
+		const userExists = users.find((user) => user.id === username);
+
+		if (userExists) {
+			users.splice(users.indexOf(userExists), 1);
+		}
+		users.unshift({
+			id: username,
+			avatar_url: data.avatar_url,
+			name: data.name,
+			url: data.html_url,
+		});
+
+		localStorage.setItem("github-users", JSON.stringify(users));
+	};
 
   return (
     <form onSubmit={handleSubmit}>
